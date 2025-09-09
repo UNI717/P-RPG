@@ -1,0 +1,188 @@
+[
+  {
+    "name": "Fogo",
+    "emoji": "🔥",
+    "color": "#ff4500",
+    "description": "O elemento do fogo, representando paixão e destruição.",
+    "advantage": [
+      "Gelo",
+      "Terra",
+      "Natureza"
+    ],
+    "disadvantage": [
+      "Água",
+      "Energia Dracônica",
+      "Sangue"
+    ]
+  },
+  {
+    "name": "Água",
+    "emoji": "💧",
+    "color": "#1e90ff",
+    "description": "O elemento da água, simbolizando adaptabilidade e fluidez.",
+    "advantage": [
+      "Fogo",
+      "Natureza"
+    ],
+    "disadvantage": [
+      "Ar",
+      "Energia",
+      "Gelo",
+      "Dominus"
+    ]
+  },
+  {
+    "name": "Ar",
+    "emoji": "💨",
+    "color": "#00ffff",
+    "description": "O elemento do ar, associado com liberdade e rapidez.",
+    "advantage": [
+      "Água",
+      "Natureza"
+    ],
+    "disadvantage": [
+      "Terra",
+      "Energia",
+      "Gelo"
+    ]
+  },
+  {
+    "name": "Terra",
+    "emoji": "🌍",
+    "color": "#7cfc00",
+    "description": "O elemento da terra, para estabilidade e base.",
+    "advantage": [
+      "Ar",
+      "Energia"
+    ],
+    "disadvantage": [
+      "Fogo",
+      "Natureza"
+    ]
+  },
+  {
+    "name": "Gelo",
+    "emoji": "❄️",
+    "color": "#00bfff",
+    "description": "O elemento do gelo, representando calma e preservação.",
+    "advantage": [
+      "Água",
+      "Ar",
+      "Natureza",
+      "Sangue"
+    ],
+    "disadvantage": [
+      "Fogo",
+      "Energia Dracônica"
+    ]
+  },
+  {
+    "name": "Energia",
+    "emoji": "⚡",
+    "color": "#ffff00",
+    "description": "O elemento de energia pura, para velocidade e poder.",
+    "advantage": [
+      "Água",
+      "Ar",
+      "Sangue"
+    ],
+    "disadvantage": [
+      "Terra",
+      "Energia Dracônica",
+      "Dominus"
+    ]
+  },
+  {
+    "name": "Luz",
+    "emoji": "☀️",
+    "color": "#fada5e",
+    "description": "O elemento da luz, simbolizando esperança e conhecimento.",
+    "advantage": [
+      "Dominus",
+      "Natureza",
+      "Energia Dracônica"
+    ],
+    "disadvantage": [
+      "Sangue"
+    ]
+  },
+  {
+    "name": "Trevas",
+    "emoji": "🌑",
+    "color": "#8a2be2",
+    "description": "O elemento da escuridão, representando mistério e o desconhecido.",
+    "advantage": [
+      "Sangue"
+    ],
+    "disadvantage": [
+      "Dominus",
+      "Energia Dracônica"
+    ]
+  },
+  {
+    "name": "Natureza",
+    "emoji": "🌳",
+    "color": "#32cd32",
+    "description": "O elemento da natureza, para vida e crescimento.",
+    "advantage": [
+      "Terra"
+    ],
+    "disadvantage": [
+      "Fogo",
+      "Água",
+      "Ar",
+      "Gelo",
+      "Dominus",
+      "Sangue",
+      "Luz",
+      "Energia Dracônica"
+    ]
+  },
+  {
+    "name": "Dominus",
+    "emoji": "👑",
+    "color": "#ffd700",
+    "description": "O elemento de dominação, controlando todos os outros.",
+    "advantage": [
+      "Trevas",
+      "Água",
+      "Natureza",
+      "Energia"
+    ],
+    "disadvantage": [
+      "Luz"
+    ]
+  },
+  {
+    "name": "Sangue",
+    "emoji": "🩸",
+    "color": "#ff0033",
+    "description": "O elemento de sangue, representando força vital e sacrifício.",
+    "advantage": [
+      "Natureza",
+      "Ar",
+      "Fogo"
+    ],
+    "disadvantage": [
+      "Gelo",
+      "Energia",
+      "Trevas"
+    ]
+  },
+  {
+    "name": "Energia Dracônica",
+    "emoji": "🐉",
+    "color": "#ff6347",
+    "description": "Uma energia antiga e primordial, representando poder e misticismo.",
+    "advantage": [
+      "Fogo",
+      "Gelo",
+      "Energia",
+      "Natureza",
+      "Trevas"
+    ],
+    "disadvantage": [
+      "Luz"
+    ]
+  }
+]

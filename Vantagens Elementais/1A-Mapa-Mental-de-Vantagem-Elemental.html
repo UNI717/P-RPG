@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafo de Elementos</title>
+    <!-- Biblioteca D3.js para o grafo de força-dirigida -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Google Fonts para um visual limpo e moderno -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Estilização geral do corpo para o tema escuro e fonte */
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #0a0a1a;
+            color: #e0e0e0;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Canvas para o fundo de campo estelar */
+        #starfield {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Container principal SVG para o grafo */
+        svg {
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+
+        svg:active {
+            cursor: grabbing;
+        }
+
+        /* Estilização para os nós do grafo (elementos) */
+        .node circle {
+            stroke: #fff;
+            stroke-width: 1.5px;
+            transition: r 0.3s ease, transform 0.3s ease, filter 0.3s ease, opacity 0.5s ease;
+        }
+        
+        /* Efeito de pulsação no clique */
+        .node.selected circle {
+            transform: scale(1.2);
+            animation: pulse 1s infinite alternate;
+        }
+        
+        /* Efeito de aumento no hover */
+        .node:hover circle {
+            r: 30; /* Aumenta o raio do círculo */
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5)); /* Adiciona um brilho */
+        }
+        
+        @keyframes pulse {
+            from { transform: scale(1.2); }
+            to { transform: scale(1.25); }
+        }
+
+        .node text {
+            fill: #f0f0f0;
+            font-size: 14px;
+            text-anchor: middle;
+            pointer-events: none; /* O texto não deve bloquear eventos de mouse no círculo */
+            text-shadow: 0 0 5px #000;
+            transition: opacity 0.5s ease;
+        }
+
+        .node .emoji {
+            font-size: 24px;
+        }
+        
+        /* Adiciona um indicador visual para nós fixados */
+        .node.pinned .emoji {
+            filter: drop-shadow(0 0 10px #00ffc8);
+        }
+
+        /* Estilização para as conexões entre os nós */
+        .link, .glow-link {
+            transition: stroke-opacity 0.5s ease, filter 0.5s ease, stroke-width 0.5s ease;
+        }
+
+        .link {
+            stroke-opacity: 0.4;
+        }
+
+        .glow-link {
+            stroke-width: 2px; /* Linha de brilho mais fina */
+            stroke-opacity: 0.1; /* Inicia com opacidade baixa */
+            filter: blur(2px); /* Aplica o efeito de desfoque mais sutil */
+        }
+
+        /* Animação para o efeito de "fluxo de energia" nas linhas */
+        .link.pulsing, .glow-link.pulsing {
+            animation: linkPulse 1s infinite alternate;
+        }
+
+        @keyframes linkPulse {
+            from { stroke-width: 1.5px; }
+            to { stroke-width: 2px; }
+        }
+        
+        /* Controles da UI */
+        .controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-color: rgba(20, 20, 40, 0.8);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .controls p {
+            margin: 0;
+            font-size: 12px;
+            color: #ccc;
+            text-align: center;
+        }
+
+        /* Estilização geral dos botões */
+        .controls button {
+            background-color: #4a4a8a;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            text-align: center;
+        }
+
+        .controls button:hover {
+            background-color: #6a6ad2;
+        }
+
+        .controls button:active {
+            transform: scale(0.95);
+        }
+
+        /* Estilização da Legenda */
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background-color: rgba(20, 20, 40, 0.8);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+        
+        .legend-item.inactive {
+            opacity: 0.5;
+        }
+
+        .legend-line {
+            width: 30px;
+            height: 2px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas para o fundo animado de campo estelar -->
+    <canvas id="starfield"></canvas>
+
+    <!-- Container SVG onde o grafo D3 será renderizado -->
+    <svg id="graph"></svg>
+
+    <!-- Controles da UI -->
+    <div class="controls">
+        <p>Clique e arraste para mover</p>
+        <p>Clique 2x para soltar</p>
+        <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1);">
+        <button id="reset-button">Resetar Posições</button>
+        <button id="export-button">Exportar Dados</button>
+        <button id="import-button">Importar Dados</button>
+        <!-- Campo de arquivo oculto para a importação -->
+        <input type="file" id="file-input" style="display: none;" accept=".json">
+    </div>
+    
+    <!-- Legenda para os tipos de conexão -->
+    <div class="legend">
+        <div class="legend-item" data-type="advantage">
+            <div class="legend-line" style="background: linear-gradient(to right, #00ff7f, #ff4500);"></div>
+            <span>Vantagem</span>
+        </div>
+        <div class="legend-item" data-type="disadvantage">
+            <div class="legend-line" style="background: linear-gradient(to right, #ff4500, #00ff7f);"></div>
+            <span>Desvantagem</span>
+        </div>
+    </div>
+    
+    <script>
+        // --- Animação de Fundo de Campo Estelar e Nebulosa ---
+        const starfieldCanvas = document.getElementById('starfield');
+        const ctx = starfieldCanvas.getContext('2d');
+
+        function resizeCanvas() {
+            starfieldCanvas.width = window.innerWidth;
+            starfieldCanvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const stars = [];
+        const numStars = 500;
+        const nebulae = [];
+        const numNebulae = 5;
+
+        for (let i = 0; i < numStars; i++) {
+            stars.push({
+                x: Math.random() * starfieldCanvas.width,
+                y: Math.random() * starfieldCanvas.height,
+                radius: Math.random() * 1.5,
+                alpha: Math.random(),
+                speed: Math.random() * 0.2 + 0.1
+            });
+        }
+        
+        for (let i = 0; i < numNebulae; i++) {
+            nebulae.push({
+                x: Math.random() * starfieldCanvas.width,
+                y: Math.random() * starfieldCanvas.height,
+                radius: Math.random() * 300 + 200,
+                color: `rgba(${Math.floor(Math.random() * 100)}, ${Math.floor(Math.random() * 100)}, 255, 0.05)`, // Azul claro, roxo
+                speedX: (Math.random() - 0.5) * 0.1,
+                speedY: (Math.random() - 0.5) * 0.1
+            });
+        }
+
+        function drawStarfield() {
+            ctx.clearRect(0, 0, starfieldCanvas.width, starfieldCanvas.height);
+            
+            const gradient = ctx.createRadialGradient(
+                starfieldCanvas.width / 2, starfieldCanvas.height / 2, 0,
+                starfieldCanvas.width / 2, starfieldCanvas.height / 2, Math.max(starfieldCanvas.width, starfieldCanvas.height) / 1.5
+            );
+            gradient.addColorStop(0, 'rgba(30, 0, 50, 0.4)');
+            gradient.addColorStop(1, 'rgba(0, 0, 20, 0.6)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, starfieldCanvas.width, starfieldCanvas.height);
+
+            nebulae.forEach(nebula => {
+                ctx.beginPath();
+                ctx.arc(nebula.x, nebula.y, nebula.radius, 0, Math.PI * 2);
+                ctx.fillStyle = nebula.color;
+                ctx.filter = 'blur(20px)';
+                ctx.fill();
+
+                nebula.x += nebula.speedX;
+                nebula.y += nebula.speedY;
+
+                if (nebula.x > starfieldCanvas.width + nebula.radius) nebula.x = -nebula.radius;
+                if (nebula.x < -nebula.radius) nebula.x = starfieldCanvas.width + nebula.radius;
+                if (nebula.y > starfieldCanvas.height + nebula.radius) nebula.y = -nebula.radius;
+                if (nebula.y < -nebula.radius) nebula.y = starfieldCanvas.height + nebula.radius;
+            });
+            ctx.filter = 'none';
+
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+                ctx.fill();
+
+                star.y -= star.speed;
+                if (star.y < 0) {
+                    star.y = starfieldCanvas.height;
+                    star.x = Math.random() * starfieldCanvas.width;
+                }
+            });
+            requestAnimationFrame(drawStarfield);
+        }
+        drawStarfield();
+
+        // --- Visualização do Grafo D3 ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const svg = d3.select("#graph");
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            let simulation, link, glowLink, node, zoom, gradients;
+            let graphData = { nodes: [], links: [] };
+            let selectedNodeId = null; 
+            
+            // Mapeamento de cores para os efeitos de brilho
+            const colorMap = {
+                "Fogo": "#ff4500",
+                "Água": "#1e90ff",
+                "Ar": "#00ffff",
+                "Terra": "#7cfc00",
+                "Gelo": "#00bfff",
+                "Energia": "#ffff00",
+                "Luz": "#fada5e",
+                "Trevas": "#8a2be2",
+                "Natureza": "#32cd32",
+                "Dominus": "#ffd700",
+                "Sangue": "#dc143c",
+                "Energia Dracônica": "#ff6347"
+            };
+
+            // Dados fixos dos elementos
+            let currentElements = [
+                { name: "Fogo", emoji: "🔥", description: "O elemento do fogo, representando paixão e destruição.", advantage: ["Gelo", "Terra", "Natureza"], disadvantage: ["Água", "Energia Dracônica"] },
+                { name: "Água", emoji: "💧", description: "O elemento da água, simbolizando adaptabilidade e fluidez.", advantage: ["Fogo", "Natureza"], disadvantage: ["Ar", "Energia", "Gelo", "Dominus"] },
+                { name: "Ar", emoji: "💨", description: "O elemento do ar, associado com liberdade e rapidez.", advantage: ["Água", "Natureza"], disadvantage: ["Terra", "Energia", "Gelo"] },
+                { name: "Terra", emoji: "🌍", description: "O elemento da terra, para estabilidade e base.", advantage: ["Ar", "Energia"], disadvantage: ["Fogo", "Natureza"] },
+                { name: "Gelo", emoji: "❄️", description: "O elemento do gelo, representando calma e preservação.", advantage: ["Água", "Ar", "Natureza", "Sangue"], disadvantage: ["Fogo", "Energia Dracônica"] },
+                { name: "Energia", emoji: "⚡", description: "O elemento de energia pura, para velocidade e poder.", advantage: ["Água", "Ar", "Sangue"], disadvantage: ["Terra", "Dominus", "Energia Dracônica"] },
+                { name: "Luz", emoji: "☀️", description: "O elemento da luz, simbolizando esperança e conhecimento.", advantage: ["Trevas", "Energia Dracônica"], disadvantage: ["Sangue"] },
+                { name: "Trevas", emoji: "🌑", description: "O elemento da escuridão, representando mistério e o desconhecido.", advantage: ["Luz", "Sangue"], disadvantage: ["Dominus", "Energia Dracônica"] },
+                { name: "Natureza", emoji: "🌳", description: "O elemento da natureza, para vida e crescimento.", advantage: ["Terra", "Luz", "Energia Dracônica"], disadvantage: ["Fogo", "Água", "Ar", "Gelo", "Dominus", "Sangue"] },
+                { name: "Dominus", emoji: "👑", description: "O elemento de dominação, controlando todos os outros.", advantage: ["Trevas", "Água", "Natureza"], disadvantage: ["Luz", "Energia"] },
+                { name: "Sangue", emoji: "🩸", description: "O elemento de sangue, representando força vital e sacrifício.", advantage: ["Natureza", "Ar"], disadvantage: ["Gelo", "Energia", "Trevas"] },
+                { name: "Energia Dracônica", emoji: "🐉", description: "Uma energia antiga e primordial, representando poder e misticismo.", advantage: ["Fogo", "Gelo", "Energia", "Trevas"], disadvantage: ["Luz", "Natureza"] }
+            ];
+
+            // Função para processar os dados brutos para o formato compatível com D3
+            function processData(elements) {
+                const nodes = elements.map(el => ({ id: el.name, ...el }));
+                const links = [];
+                elements.forEach(sourceEl => {
+                    sourceEl.advantage.forEach(targetName => {
+                        if (elements.find(el => el.name === targetName)) {
+                            links.push({ source: sourceEl.name, target: targetName, type: 'advantage' });
+                        }
+                    });
+                    sourceEl.disadvantage.forEach(targetName => {
+                        if (elements.find(el => el.name === targetName)) {
+                            links.push({ source: sourceEl.name, target: targetName, type: 'disadvantage' });
+                        }
+                    });
+                });
+                return { nodes, links };
+            }
+
+            // Função para inicializar e renderizar o grafo
+            function renderGraph(data) {
+                graphData = data;
+                svg.selectAll("*").remove(); // Limpa o grafo anterior
+
+                const g = svg.append("g");
+                
+                // --- Configuração da Simulação de Força ---
+                simulation = d3.forceSimulation(graphData.nodes)
+                    .force("link", d3.forceLink(graphData.links).id(d => d.id).distance(250)) 
+                    .force("charge", d3.forceManyBody().strength(-250)) 
+                    .force("center", d3.forceCenter(width / 2, height / 2)) 
+                    .force("collide", d3.forceCollide().radius(40)); 
+
+                // --- Renderização de Gradientes para as Linhas ---
+                const defs = g.append("defs");
+
+                // Cria um gradiente linear para cada link
+                gradients = defs.selectAll("linearGradient")
+                    .data(graphData.links)
+                    .enter().append("linearGradient")
+                    .attr("id", d => `link-gradient-${d.source.id.replace(/\s/g, '-')}-${d.target.id.replace(/\s/g, '-')}`)
+                    .attr("gradientUnits", "userSpaceOnUse");
+
+                gradients.append("stop")
+                    .attr("offset", "45%")
+                    .attr("stop-color", d => d.type === 'advantage' ? "#00ff7f" : "#ff4500");
+                gradients.append("stop")
+                    .attr("offset", "55%")
+                    .attr("stop-color", d => d.type === 'advantage' ? "#ff4500" : "#00ff7f");
+
+                // --- Renderização dos Links de Brilho (Glow Links) ---
+                glowLink = g.append("g")
+                    .attr("class", "glow-links")
+                    .selectAll("line")
+                    .data(graphData.links)
+                    .enter().append("line")
+                    .attr("class", "glow-link")
+                    .attr("stroke", d => `url(#link-gradient-${d.source.id.replace(/\s/g, '-')}-${d.target.id.replace(/\s/g, '-')})`);
+
+                // --- Renderização dos Links (Conexões) ---
+                link = g.append("g")
+                    .attr("class", "links")
+                    .selectAll("line")
+                    .data(graphData.links)
+                    .enter().append("line")
+                    .attr("class", "link")
+                    .attr("stroke-width", 1.5)
+                    .attr("stroke", d => `url(#link-gradient-${d.source.id.replace(/\s/g, '-')}-${d.target.id.replace(/\s/g, '-')})`);
+
+                // --- Renderização dos Nós (Vértices) ---
+                node = g.append("g")
+                    .attr("class", "nodes")
+                    .selectAll("g")
+                    .data(graphData.nodes)
+                    .enter().append("g")
+                    .attr("class", "node");
+
+                node.append("circle")
+                    .attr("r", 25)
+                    .attr("fill", d => colorMap[d.name] || "#2a2a4a");
+
+                node.append("text")
+                    .attr("class", "emoji")
+                    .attr("dy", ".35em")
+                    .text(d => d.emoji);
+                
+                node.append("text")
+                    .attr("class", "label")
+                    .attr("y", 40)
+                    .text(d => d.name);
+
+                // --- Interatividade (Baseada em Clique e Hover) ---
+                node.on("click", handleClick)
+                    .on("dblclick", handleDblClick) // Adiciona o evento de duplo clique
+                    .call(d3.drag()
+                        .on("start", dragstarted)
+                        .on("drag", dragged)
+                        .on("end", dragended)); // O dragended foi modificado
+
+                svg.on("click", (event) => {
+                    if (event.target.closest('.node') === null) {
+                        deselectAll();
+                    }
+                });
+
+                // --- Configuração de Zoom e Pan ---
+                zoom = d3.zoom()
+                    .on("zoom", (event) => {
+                        g.attr("transform", event.transform);
+                    })
+                    .filter(event => event.type !== 'dblclick');
+                svg.call(zoom);
+
+                // --- Loop de Simulação (O CORAÇÃO DO MOVIMENTO) ---
+                simulation.on("tick", () => {
+                    glowLink
+                        .attr("x1", d => d.source.x)
+                        .attr("y1", d => d.source.y)
+                        .attr("x2", d => d.target.x)
+                        .attr("y2", d => d.target.y);
+
+                    link
+                        .attr("x1", d => d.source.x)
+                        .attr("y1", d => d.source.y)
+                        .attr("x2", d => d.target.x)
+                        .attr("y2", d => d.target.y);
+                    
+                    gradients
+                        .attr("x1", d => d.source.x)
+                        .attr("y1", d => d.source.y)
+                        .attr("x2", d => d.target.x)
+                        .attr("y2", d => d.target.y);
+
+                    node.attr("transform", d => `translate(${d.x},${d.y})`);
+                });
+            }
+
+            // --- Funções de Seleção e Desseleção ---
+            function deselectAll() {
+                selectedNodeId = null;
+                node.style("opacity", 1).classed("selected", false);
+                node.select("circle").style("filter", "none");
+                link.style("stroke-opacity", 0.4).classed("pulsing", false);
+                glowLink.style("stroke-opacity", 0.2).classed("pulsing", false);
+            }
+
+            // --- Manipuladores de Evento ---
+
+            function handleClick(event, d) {
+                if (selectedNodeId === d.id) {
+                    deselectAll();
+                } else {
+                    selectedNodeId = d.id;
+                    const connectedNodeIds = new Set();
+                    connectedNodeIds.add(d.id);
+                    graphData.links.forEach(l => {
+                        if (l.source.id === d.id || l.target.id === d.id) {
+                            connectedNodeIds.add(l.source.id);
+                            connectedNodeIds.add(l.target.id);
+                        }
+                    });
+                    
+                    node.style("opacity", n => connectedNodeIds.has(n.id) ? 1 : 0.2);
+                    node.classed("selected", n => n.id === d.id);
+                    node.select("circle").style("filter", n => n.id === d.id ? `drop-shadow(0 0 15px ${colorMap[n.name]})` : "none");
+
+                    link.style("stroke-opacity", l => {
+                        const isConnected = l.source.id === d.id || l.target.id === d.id;
+                        return isConnected ? 1 : 0.1;
+                    }).classed("pulsing", l => l.source.id === d.id || l.target.id === d.id);
+                    
+                    glowLink.style("stroke-opacity", l => {
+                        const isConnected = l.source.id === d.id || l.target.id === d.id;
+                        return isConnected ? 0.8 : 0.1;
+                    }).classed("pulsing", l => l.source.id === d.id || l.target.id === d.id);
+                }
+            }
+            
+            // Nova função: lida com o duplo clique para soltar um nó
+            function handleDblClick(event, d) {
+                // Remove a posição fixa do nó, permitindo que a simulação o mova livremente
+                d.fx = null;
+                d.fy = null;
+                // Remove a classe 'pinned' para remover o indicador visual
+                d3.select(this).classed("pinned", false);
+                // Reinicia a simulação para que a mudança tenha efeito imediato
+                simulation.alpha(1).restart();
+                // Impede que o duplo clique ative o zoom padrão do navegador
+                event.stopPropagation();
+            }
+
+            // --- Manipuladores de Arrastar ---
+            function dragstarted(event, d) {
+                if (!event.active) simulation.alphaTarget(0.3).restart();
+                d.fx = d.x;
+                d.fy = d.y;
+            }
+
+            function dragged(event, d) {
+                d.fx = event.x;
+                d.fy = event.y;
+            }
+
+            // A única mudança foi aqui! Nós não removemos o `fx` e `fy`
+            function dragended(event, d) {
+                if (!event.active) simulation.alphaTarget(0);
+                // O nó agora mantém sua posição fixa (`d.fx` e `d.fy` não são definidos como null)
+                // Adicionamos uma classe CSS para indicar visualmente que o nó está fixo
+                d3.select(this).classed("pinned", true);
+            }
+            
+            // --- Lógica do Botão de Controle ---
+            document.getElementById('reset-button').addEventListener('click', () => {
+                // Para resetar, precisamos remover a posição fixa de todos os nós antes de reiniciar a simulação
+                graphData.nodes.forEach(n => {
+                    n.fx = null;
+                    n.fy = null;
+                });
+                // Remove a classe 'pinned' de todos os nós
+                node.classed("pinned", false);
+                simulation.alpha(1).restart();
+                svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
+                deselectAll();
+                document.querySelectorAll('.legend-item').forEach(item => {
+                    item.classList.remove('inactive');
+                });
+                link.style("stroke-opacity", 0.4);
+            });
+            
+            // --- Funcionalidade de Importar e Exportar ---
+            document.getElementById('export-button').addEventListener('click', () => {
+                const jsonData = JSON.stringify(currentElements, null, 2);
+                const blob = new Blob([jsonData], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'element_graph.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+
+            document.getElementById('import-button').addEventListener('click', () => {
+                document.getElementById('file-input').click();
+            });
+
+            document.getElementById('file-input').addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        if (Array.isArray(importedData)) {
+                            currentElements = importedData;
+                            const newData = processData(currentElements);
+                            renderGraph(newData);
+                            simulation.alpha(1).restart();
+                            deselectAll();
+                        } else {
+                            console.error("Formato de arquivo JSON inválido. Esperado um array de elementos.");
+                        }
+                    } catch (error) {
+                        console.error("Erro ao ler ou analisar o arquivo JSON:", error);
+                    }
+                };
+                reader.readAsText(file);
+            });
+
+            // --- Funcionalidade da Legenda ---
+            document.querySelectorAll('.legend-item').forEach(item => {
+                item.addEventListener('click', (event) => {
+                    const type = item.dataset.type;
+                    const isActive = item.classList.toggle('inactive');
+                    
+                    if (isActive) {
+                        link.style("stroke-opacity", l => l.type === type ? 1 : 0);
+                    } else {
+                        link.style("stroke-opacity", 0.4);
+                        document.querySelectorAll('.legend-item').forEach(l => {
+                            if (l !== item) {
+                                l.classList.remove('inactive');
+                            }
+                        });
+                    }
+                });
+            });
+
+            // --- Carregamento Inicial ---
+            const initialData = processData(currentElements);
+            renderGraph(initialData);
+
+            window.addEventListener('resize', () => {
+                const newWidth = window.innerWidth;
+                const newHeight = window.innerHeight;
+                simulation.force("center", d3.forceCenter(newWidth / 2, newHeight / 2));
+                simulation.alpha(0.3).restart();
+            });
+        });
+    </script>
+</body>
+</html>
