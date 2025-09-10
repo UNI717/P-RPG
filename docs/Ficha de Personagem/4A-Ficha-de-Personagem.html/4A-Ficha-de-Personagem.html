@@ -1,0 +1,305 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha de Personagem - XP Unificada</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="4A-Ficha-de-Personagem.css">
+    <script src="4A-Ficha-de-Personagem.js" defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;600&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="p-4 sm:p-6 lg:p-8">
+    <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Coluna da Esquerda -->
+        <div class="lg:col-span-1 flex flex-col gap-6">
+            <!-- Card Perfil -->
+            <div id="profile-card" class="card p-6 flex flex-col items-center relative">
+                <!-- Barra de alternância do layout -->
+                <div id="profile-toggle"></div>
+
+                <!-- Seção de título e nível -->
+                <div class="flex items-center w-full mb-4">
+                    <h2 id="profile-header-title" class="card-header !mb-0 flex-grow">PERFIL</h2>
+                    <!-- Linha divisória -->
+                    <div class="flex-grow border-b border-slate-700 mx-4"></div>
+                    <!-- Nível -->
+                    <div class="text-center">
+                        <h3 class="status-title !text-sm !m-0">NÍVEL</h3>
+                        <div id="level" contenteditable="true" class="editable stat-value text-xl p-0 mt-1 mx-auto w-16 !bg-transparent !shadow-none">1</div>
+                    </div>
+                </div>
+
+                <!-- Novo contêiner para o conteúdo do perfil -->
+                <div class="profile-content w-full flex flex-col items-center space-y-4">
+                    <!-- Nova seção para o layout superior no modo compacto -->
+                    <div class="profile-top-section w-full">
+                        <!-- Avatar e XP Circular -->
+                        <div class="avatar-xp-wrapper">
+                            <svg class="w-full h-full" viewBox="0 0 150 150">
+                                <circle cx="75" cy="75" r="68.5" fill="transparent" stroke="var(--border-color)" stroke-width="4"></circle>
+                                <circle id="xp-circle-progress" cx="75" cy="75" r="68.5" fill="transparent" stroke="var(--xp-color)" stroke-width="4" stroke-dasharray="430.4" stroke-dashoffset="430.4" transform="rotate(-90 75 75)"></circle>
+                            </svg>
+                            <div id="avatar" class="avatar mb-4">
+                                <span>Clique para<br>adicionar imagem</span>
+                                <input type="file" id="avatar-input" class="hidden" accept="image/*">
+                            </div>
+                        </div>
+                        <!-- Barra de XP Linear -->
+                        <div id="xp-bar-container" class="mt-4 flex-grow">
+                            <!-- Título e números da XP, agora com nova estrutura para o modo compacto -->
+                            <div class="xp-bar-text-section flex justify-between items-center pb-1 mb-1 border-b border-slate-700">
+                                <h3 id="xp-title" class="status-title !text-base">EXPERIÊNCIA</h3>
+                                <div id="xp-numbers-top" class="flex items-center gap-2">
+                                    <div id="xp-current" contenteditable="true" class="editable text-base text-white bg-slate-700 rounded-md text-center w-10 p-0">0</div>
+                                    <span class="text-base">/</span>
+                                    <div id="xp-max" contenteditable="true" class="editable text-base text-white bg-slate-700 rounded-md text-center w-10 p-0">100</div>
+                                </div>
+                            </div>
+                            <div id="xp-bar-wrapper" class="flex-grow mt-2">
+                                <div class="health-bar-container !h-3 flex-grow">
+                                    <div id="xp-bar" class="health-bar !h-full" style="background-color: var(--xp-color);"></div>
+                                </div>
+                                <div id="xp-numbers-side" class="xp-numbers flex items-center gap-1.5">
+                                    <div id="xp-current-side" contenteditable="true" class="editable text-xs text-white bg-slate-700 rounded-md text-center w-8 p-0">0</div>
+                                    <span class="text-xs">/</span>
+                                    <div id="xp-max-side" contenteditable="true" class="editable text-xs text-white bg-slate-700 rounded-md text-center w-8 p-0">100</div>
+                                </div>
+                            </div>
+                            <!-- Barra de bônus de XP (branca) - Oculta por padrão -->
+                            <div id="xp-bonus-bar-container" class="xp-bonus-bar-container hidden">
+                                <div id="xp-bonus-bar" class="xp-bonus-bar"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Nome e detalhes -->
+                    <div class="profile-text-container w-full text-center mt-4">
+                        <div id="char-name" contenteditable="true" spellcheck="false" class="editable text-4xl font-bold text-white" style="font-family: 'Teko', sans-serif;">NOME DO PERSONAGEM</div>
+                        <div id="char-details" contenteditable="true" class="editable text-lg text-gray-400">Classe e Raça</div>
+                    </div>
+                    <!-- Conteúdo de características e XP -->
+                    <div id="profile-stats" class="w-full space-y-6">
+                        <!-- Characteristics Section -->
+                        <div class="space-y-2">
+                            <h3 class="card-header !text-base !m-0">CARACTERÍSTICAS</h3>
+                            <div class="space-y-2">
+                                <div class="space-y-1.5">
+                                    <label class="text-xs text-gray-400">Raça</label>
+                                    <div id="char-race" contenteditable="true" class="editable text-base"></div>
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label class="text-xs text-gray-400">Classe</label>
+                                    <div id="char-class" contenteditable="true" class="editable text-base"></div>
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label class="text-xs text-gray-400">Idade</label>
+                                    <div id="char-age" contenteditable="true" class="editable text-base"></div>
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label class="text-xs text-gray-400">Altura</label>
+                                    <div id="char-height" contenteditable="true" class="editable text-base"></div>
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label class="text-xs text-gray-400">Poderes</label>
+                                    <div id="char-powers" contenteditable="true" class="editable text-base h-20 overflow-y-auto redimensao"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Atributos -->
+            <div class="card p-6">
+                <h2 class="card-header">ATRIBUTOS</h2>
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="stat-box">
+                        <div class="stat-label">FOR</div>
+                        <div id="str-score" contenteditable="true" class="editable stat-value">10</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">DES</div>
+                        <div id="dex-score" contenteditable="true" class="editable stat-value">10</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">CON</div>
+                        <div id="con-score" contenteditable="true" class="editable stat-value">10</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">INT</div>
+                        <div id="int-score" contenteditable="true" class="editable stat-value">10</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">SAB</div>
+                        <div id="wis-score" contenteditable="true" class="editable stat-value">10</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">CAR</div>
+                        <div id="cha-score" contenteditable="true" class="editable stat-value">10</div>
+                    </div>
+                </div>
+            </div>
+            <!-- Perícias -->
+            <div class="card p-6">
+                <h2 class="card-header">PERÍCIAS</h2>
+                <div id="skills-list" contenteditable="true" class="editable space-y-2 text-lg h-48 overflow-y-auto redimensao">
+                    <div>Acrobacia (Des)</div>
+                    <div>Atletismo (For)</div>
+                    <div>Enganação (Car)</div>
+                    <div>Furtividade (Des)</div>
+                    <div>Intimidação (Car)</div>
+                    <div>Percepção (Sab)</div>
+                    <div>Sobrevivência (Sab)</div>
+                </div>
+            </div>
+            <!-- Status e Recursos -->
+            <div class="card p-6">
+                <h2 class="card-header">RECURSOS</h2>
+                <div id="dynamic-resources-container" class="space-y-8"></div>
+                <button id="add-resource-btn" class="mt-4 text-cyan-300 hover:text-cyan-400 font-bold">+ Adicionar Status</button>
+            </div>
+        </div>
+        <!-- Coluna Central e Direita -->
+        <div class="lg:col-span-2 flex flex-col gap-6">
+            <!-- Status de Combate -->
+            <div class="card p-6">
+                <h2 class="card-header">COMBATE</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="stat-box">
+                        <div class="stat-label">ARMADURA</div>
+                        <div id="ac" contenteditable="true" class="editable stat-value">10</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">INICIATIVA</div>
+                        <div id="initiative" contenteditable="true" class="editable stat-value">+0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">VELOCIDADE</div>
+                        <div id="speed" contenteditable="true" class="editable stat-value">9m</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">BÔNUS PROF.</div>
+                        <div id="proficiency" contenteditable="true" class="editable stat-value">+2</div>
+                    </div>
+                </div>
+                <!-- Pontos de Vida -->
+                <div class="mt-6">
+                    <div class="flex justify-between items-center pb-2 mb-2 border-b border-slate-700">
+                        <h2 class="status-title">PONTOS DE VIDA</h2>
+                        <div class="flex items-center gap-2">
+                            <div id="hp-current" contenteditable="true" class="editable text-xl text-white bg-slate-700 rounded-md text-center w-20">10</div>
+                            <span class="text-xl">/</span>
+                            <div id="hp-max" contenteditable="true" class="editable text-xl text-white bg-slate-700 rounded-md text-center w-20">10</div>
+                        </div>
+                    </div>
+                    <div class="health-bar-container">
+                        <div id="health-bar" class="health-bar"></div>
+                    </div>
+                </div>
+                <!-- Pontos de Mana -->
+                <div class="mt-6">
+                    <div class="flex justify-between items-center pb-2 mb-2 border-b border-slate-700">
+                        <h2 class="status-title">PONTOS DE MANA</h2>
+                        <div class="flex items-center gap-2">
+                            <div id="mp-current" contenteditable="true" class="editable text-xl text-white bg-slate-700 rounded-md text-center w-20">10</div>
+                            <span class="text-xl">/</span>
+                            <div id="mp-max" contenteditable="true" class="editable text-xl text-white bg-slate-700 rounded-md text-center w-20">10</div>
+                        </div>
+                    </div>
+                    <div class="mana-bar-container">
+                        <div id="mana-bar" class="mana-bar"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- Inventário -->
+            <div class="card p-6">
+                <h2 class="card-header">INVENTÁRIO</h2>
+                <table class="w-full inventory-table">
+                    <thead>
+                        <tr class="border-b border-slate-700 text-left">
+                            <th class="p-2">Item</th>
+                            <th class="p-2 w-16 text-center">Qtd</th>
+                            <th class="p-2 w-24">Peso</th>
+                            <th class="p-2 w-10"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventory-body"></tbody>
+                </table>
+                <button id="add-item-btn" class="mt-4 text-cyan-300 hover:text-cyan-400">+ Adicionar Item</button>
+            </div>
+            <!-- Magias -->
+            <div class="card p-6">
+                <h2 class="card-header">GRIMÓRIO DE MAGIAS</h2>
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-400">Truques</h3>
+                        <div id="cantrips" contenteditable="true" class="editable w-full h-24 p-2 bg-slate-900 rounded-md"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-400">Nível 1</h3>
+                        <div id="spells-1" contenteditable="true" class="editable w-full h-24 p-2 bg-slate-900 rounded-md"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- Notas e História -->
+            <div class="card p-6">
+                <h2 class="card-header">NOTAS & HISTÓRIA</h2>
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-400">Traços de Personalidade</h3>
+                        <div id="personality-traits" contenteditable="true" class="editable w-full h-20 p-2 bg-slate-900 rounded-md"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-400">Ideais, Vínculos e Defeitos</h3>
+                        <div id="ideals-bonds-flaws" contenteditable="true" class="editable w-full h-20 p-2 bg-slate-900 rounded-md"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-400">História do Personagem</h3>
+                        <div id="backstory" contenteditable="true" class="editable w-full h-32 p-2 bg-slate-900 rounded-md"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

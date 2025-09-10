@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha de Personagem - XP Unificada</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;600&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #111827;
+            --bg-card: #1f2937;
+            --border-color: #374151;
+            --text-primary: #d1d5db;
+            --text-secondary: #9ca3af;
+            --text-title: #f9fafb;
+            --accent-color: #67e8f9;
+            --accent-color-dark: #0e7490;
+            --danger-color: #ef4444;
+            --mana-color: #3b82f6;
+            --xp-color: #FFD700; /* Cor amarela para XP */
+            --xp-bonus-color: #f9fafb; /* Cor branca para a nova barra de bônus */
+        }
+        body {
+            background-color: var(--bg-main);
+            font-family: 'Roboto', sans-serif;
+            color: var(--text-primary);
+        }
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .card .redimensao {
+            resize: vertical;
+        }
+        .card-header {
+            font-family: 'Teko', sans-serif;
+            font-size: 1.75rem;
+            letter-spacing: 0.05em;
+            color: var(--accent-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .editable {
+            background-color: rgba(0,0,0,0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            min-height: 1.75rem;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            outline: none;
+            width: 100%;
+        }
+        .editable:focus {
+            background-color: var(--border-color);
+            box-shadow: 0 0 0 2px var(--accent-color);
+        }
+        .stat-box {
+            background-color: var(--border-color);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            text-align: center;
+        }
+        .stat-label {
+            font-family: 'Teko', sans-serif;
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+        }
+        .stat-value {
+            font-size: 2.25rem;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--text-title);
+        }
+        .avatar-xp-wrapper {
+            position: relative;
+            width: 180px; /* Avatar size + border */
+            height: 180px;
+            margin: 0 auto;
+            transition: all 0.5s ease-in-out;
+        }
+        .avatar {
+            width: 140px; /* Reduzido para expor a barra circular */
+            height: 140px; /* Reduzido para expor a barra circular */
+            background-color: var(--border-color);
+            border: 2px dashed #4b5563;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            background-size: cover;
+            background-position: center;
+            transition: all 0.5s ease-in-out;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .avatar:hover {
+            border-color: var(--accent-color);
+        }
+        .health-bar-container, .mana-bar-container, .dynamic-bar-container, .xp-bonus-bar-container {
+            background-color: #4b5563;
+            border-radius: 0.25rem;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        .health-bar {
+            background-color: var(--danger-color);
+            height: 1.25rem;
+            width: 100%;
+            transition: width 0.5s ease-in-out;
+        }
+        .mana-bar {
+            background-color: var(--mana-color);
+            height: 1.25rem;
+            width: 100%;
+            transition: width 0.5s ease-in-out;
+        }
+        .dynamic-bar {
+            height: 1.25rem;
+            width: 100%;
+            transition: width 0.5s ease-in-out;
+            background-color: var(--custom-color, #67e8f9);
+        }
+        .xp-bonus-bar {
+            height: 0.5rem; /* Mais fina para indicar bônus */
+            width: 100%;
+            transition: width 0.5s ease-in-out;
+            background-color: var(--xp-bonus-color);
+        }
+        .inventory-table .editable {
+            background-color: transparent;
+        }
+        .inventory-table .editable:focus {
+            background-color: var(--bg-main);
+        }
+        .inventory-table button {
+            color: var(--danger-color);
+            visibility: hidden;
+        }
+        .inventory-table tr:hover button {
+            visibility: visible;
+        }
+        .status-title {
+            font-family: 'Teko', sans-serif;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent-color);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            background-color: var(--bg-main);
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 10px;
+            border: 2px solid var(--bg-card);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--accent-color);
+        }
+        * {
+            scrollbar-color: var(--border-color) var(--bg-main);
+            scrollbar-width: thin;
+        }
+        .remove-resource-btn {
+            color: var(--danger-color);
+            padding: 0 6.6615px 0 calc(6.6615px + 0.5rem);
+        }
+        .remove-resource-btn:hover {
+            color: #fca5a5;
+        }
+        .color-dropper {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+        }
+        .color-dropper::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        .color-dropper::-webkit-color-swatch {
+            border: none;
+            border-radius: 50%;
+        }
+        .color-dropper::-moz-color-swatch {
+            border: none;
+            border-radius: 50%;
+        }
+        /* Circular XP Bar Styling */
+        .profile-xp-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 180px;
+            height: 180px;
+            transition: all 0.5s ease-in-out;
+        }
+        #xp-circle-progress {
+            transition: stroke-dashoffset 0.5s ease-in-out;
+            stroke-linecap: round;
+        }
+
+        /* Barra de alternância do layout */
+        #profile-toggle {
+            position: absolute;
+            top: 2rem;
+            right: 0.5rem; /* Distância da borda */
+            width: 0.1rem; /* Fina */
+            height: 14rem; /* Altura ajustada */
+            background-color: var(--accent-color);
+            border-radius: 0.125rem;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease-in-out;
+        }
+        #profile-toggle:hover {
+            width: 0.4rem;
+        }
+
+        /* LAYOUT COMPACTO */
+        .card.compact-profile .profile-content {
+            flex-direction: column; /* Organiza em coluna no modo compacto */
+            align-items: flex-start; /* Alinha o conteúdo à esquerda */
+        }
+        
+        /* Nova seção para o layout superior no modo compacto */
+        .card.compact-profile .profile-top-section {
+            display: flex;
+            align-items: center; /* Alinha verticalmente a foto e a barra */
+            gap: 0; /* REMOVIDO O ESPAÇO */
+            margin-bottom: 1rem;
+            width: 100%; /* Garante que a seção ocupe todo o espaço */
+        }
+        
+        .card.compact-profile .avatar-xp-wrapper {
+            width: 100px;
+            height: 100px;
+            flex-shrink: 0;
+            margin: 0;
+        }
+        
+        .card.compact-profile .avatar {
+            width: 90px;
+            height: 90px;
+            border-width: 1px;
+        }
+
+        .card.compact-profile .avatar-xp-wrapper svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Oculta o texto "EXPERIÊNCIA" e alinha os números e a barra no modo compacto */
+        .card.compact-profile #xp-title {
+            display: none;
+        }
+        
+        .card.compact-profile .xp-numbers {
+            margin-top: 0;
+        }
+
+        .card.compact-profile .xp-bar-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-grow: 1;
+        }
+        
+        .card.compact-profile .xp-bar-text-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding-bottom: 0;
+            margin-bottom: 0.5rem;
+            border: none;
+        }
+        
+        .card.compact-profile #xp-numbers-top, .card.compact-profile #xp-numbers-side {
+            gap: 0.5rem;
+        }
+
+        /* Classes para a barra de bônus */
+        .xp-bonus-bar-container {
+            height: 0.5rem;
+            background-color: #4b5563;
+            border-radius: 0.25rem;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            margin-top: 0.5rem;
+        }
+        
+        .xp-bonus-bar-container.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 lg:p-8">
+
+    <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Coluna da Esquerda -->
+        <div class="lg:col-span-1 flex flex-col gap-6">
+            <!-- Card Perfil -->
+            <div id="profile-card" class="card p-6 flex flex-col items-center relative">
+                <!-- Barra de alternância do layout -->
+                <div id="profile-toggle"></div>
+                
+                <!-- Seção de título e nível -->
+                <div class="flex items-center w-full mb-4">
+                    <h2 id="profile-header-title" class="card-header !mb-0 flex-grow">PERFIL</h2>
+                    <!-- Linha divisória -->
+                    <div class="flex-grow border-b border-slate-700 mx-4"></div>
+                    <!-- Nível -->
+                    <div class="text-center">
+                        <h3 class="status-title !text-sm !m-0">NÍVEL</h3>
+                        <div id="level" contenteditable="true" class="editable stat-value text-xl p-0 mt-1 mx-auto w-16 !bg-transparent !shadow-none">1</div>
+                    </div>
+                </div>
+                
+                <!-- Novo contêiner para o conteúdo do perfil -->
+                <div class="profile-content w-full flex flex-col items-center space-y-4">
+                    
+                    <!-- Nova seção para o layout superior no modo compacto -->
+                    <div class="profile-top-section w-full">
+                        <!-- Avatar e XP Circular -->
+                        <div class="avatar-xp-wrapper">
+                            <svg class="w-full h-full" viewBox="0 0 150 150">
+                                <circle cx="75" cy="75" r="68.5" fill="transparent" stroke="var(--border-color)" stroke-width="4"></circle>
+                                <circle id="xp-circle-progress" cx="75" cy="75" r="68.5" fill="transparent" stroke="var(--xp-color)" stroke-width="4" stroke-dasharray="430.4" stroke-dashoffset="430.4" transform="rotate(-90 75 75)"></circle>
+                            </svg>
+                            <div id="avatar" class="avatar mb-4">
+                                <span>Clique para<br>adicionar imagem</span>
+                                <input type="file" id="avatar-input" class="hidden" accept="image/*">
+                            </div>
+                        </div>
+
+                        <!-- Barra de XP Linear -->
+                        <div id="xp-bar-container" class="mt-4 flex-grow">
+                            <!-- Título e números da XP, agora com nova estrutura para o modo compacto -->
+                            <div class="xp-bar-text-section flex justify-between items-center pb-1 mb-1 border-b border-slate-700">
+                                <h3 id="xp-title" class="status-title !text-base">EXPERIÊNCIA</h3>
+                                <div id="xp-numbers-top" class="flex items-center gap-2">
+                                    <div id="xp-current" contenteditable="true" class="editable text-base text-white bg-slate-700 rounded-md text-center w-10 p-0">0</div>
+                                    <span class="text-base">/</span>
+                                    <div id="xp-max" contenteditable="true" class="editable text-base text-white bg-slate-700 rounded-md text-center w-10 p-0">100</div>
+                                </div>
+                            </div>
+                            <div id="xp-bar-wrapper" class="flex-grow mt-2">
+                                <div class="health-bar-container !h-3 flex-grow">
+                                    <div id="xp-bar" class="health-bar !h-full" style="background-color: var(--xp-color);"></div>
+                                </div>
+                                <div id="xp-numbers-side" class="xp-numbers flex items-center gap-1.5 hidden">
+                                    <div id="xp-current-side" contenteditable="true" class="editable text-xs text-white bg-slate-700 rounded-md text-center w-8 p-0">0</div>
+                                    <span class="text-xs">/</span>
+                                    <div id="xp-max-side" contenteditable="true" class="editable text-xs text-white bg-slate-700 rounded-md text-center w-8 p-0">100</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Barra de bônus de XP (branca) - Oculta por padrão -->
+                            <div id="xp-bonus-bar-container" class="xp-bonus-bar-container hidden">
+                                <div id="xp-bonus-bar" class="xp-bonus-bar"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nome e detalhes -->
+                    <div class="profile-text-container w-full text-center mt-4">
+                        <div id="char-name" contenteditable="true" spellcheck="false" class="editable text-4xl font-bold text-white" style="font-family: 'Teko', sans-serif;">NOME DO PERSONAGEM</div>
+                        <div id="char-details" contenteditable="true" class="editable text-lg text-gray-400">Classe e Raça</div>
+                    </div>
+
+                    <!-- Conteúdo de características e XP -->
+                    <div id="profile-stats" class="w-full space-y-6">
+                        <!-- Characteristics Section -->
+                        <div class="space-y-2">
+                            <h3 class="card-header !text-base !m-0">CARACTERÍSTICAS</h3>
+                            <div class="space-y-2">
+                                <div>
+                                    <label class="text-xs text-gray-400">Raça</label>
+                                    <div id="char-race" contenteditable="true" class="editable text-base"></div>
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-400">Classe</label>
+                                    <div id="char-class" contenteditable="true" class="editable text-base"></div>
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-400">Idade</label>
+                                    <div id="char-age" contenteditable="true" class="editable text-base"></div>
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-400">Altura</label>
+                                    <div id="char-height" contenteditable="true" class="editable text-base"></div>
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-400">Poderes</label>
+                                    <div id="char-powers" contenteditable="true" class="editable text-base h-20 overflow-y-auto redimensao"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Atributos -->
+            <div class="card p-6">
+                <h2 class="card-header">ATRIBUTOS</h2>
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="stat-box">
+                        <div class="stat-label">FOR</div>
+                        <div id="str-score" contenteditable="true" class="editable stat-value">10</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">DES</div>
+                        <div id="dex-score" contenteditable="true" class="editable stat-value">10</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">CON</div>
+                        <div id="con-score" contenteditable="true" class="editable stat-value">10</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">INT</div>
+                        <div id="int-score" contenteditable="true" class="editable stat-value">10</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">SAB</div>
+                        <div id="wis-score" contenteditable="true" class="editable stat-value">10</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">CAR</div>
+                        <div id="cha-score" contenteditable="true" class="editable stat-value">10</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Perícias -->
+            <div class="card p-6">
+                <h2 class="card-header">PERÍCIAS</h2>
+                <div id="skills-list" contenteditable="true" class="editable space-y-2 text-lg h-48 overflow-y-auto redimensao">
+                    <div>Acrobacia (Des)</div>
+                    <div>Atletismo (For)</div>
+                    <div>Enganação (Car)</div>
+                    <div>Furtividade (Des)</div>
+                    <div>Intimidação (Car)</div>
+                    <div>Percepção (Sab)</div>
+                    <div>Sobrevivência (Sab)</div>
+                </div>
+            </div>
+
+            <!-- Status e Recursos -->
+            <div class="card p-6">
+                <h2 class="card-header">RECURSOS</h2>
+                <div id="dynamic-resources-container" class="space-y-8">
+                    <!-- Recursos dinâmicos serão adicionados aqui -->
+                </div>
+                <button id="add-resource-btn" class="mt-4 text-cyan-300 hover:text-cyan-400 font-bold">+ Adicionar Status</button>
+            </div>
+        </div>
+
+        <!-- Coluna Central e Direita -->
+        <div class="lg:col-span-2 flex flex-col gap-6">
+            <!-- Status de Combate -->
+            <div class="card p-6">
+                 <h2 class="card-header">COMBATE</h2>
+                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="stat-box">
+                        <div class="stat-label">ARMADURA</div>
+                        <div id="ac" contenteditable="true" class="editable stat-value">10</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">INICIATIVA</div>
+                        <div id="initiative" contenteditable="true" class="editable stat-value">+0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">VELOCIDADE</div>
+                        <div id="speed" contenteditable="true" class="editable stat-value">9m</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">BÔNUS PROF.</div>
+                        <div id="proficiency" contenteditable="true" class="editable stat-value">+2</div>
+                    </div>
+                 </div>
+
+                 <!-- Pontos de Vida -->
+                 <div class="mt-6">
+                    <div class="flex justify-between items-center pb-2 mb-2 border-b border-slate-700">
+                        <h2 class="status-title">PONTOS DE VIDA</h2>
+                        <div class="flex items-center gap-2">
+                            <div id="hp-current" contenteditable="true" class="editable text-xl text-white bg-slate-700 rounded-md text-center w-20">10</div>
+                            <span class="text-xl">/</span>
+                            <div id="hp-max" contenteditable="true" class="editable text-xl text-white bg-slate-700 rounded-md text-center w-20">10</div>
+                        </div>
+                    </div>
+                    <div class="health-bar-container">
+                        <div id="health-bar" class="health-bar"></div>
+                    </div>
+                 </div>
+
+                 <!-- Pontos de Mana -->
+                 <div class="mt-6">
+                    <div class="flex justify-between items-center pb-2 mb-2 border-b border-slate-700">
+                        <h2 class="status-title">PONTOS DE MANA</h2>
+                        <div class="flex items-center gap-2">
+                            <div id="mp-current" contenteditable="true" class="editable text-xl text-white bg-slate-700 rounded-md text-center w-20">10</div>
+                            <span class="text-xl">/</span>
+                            <div id="mp-max" contenteditable="true" class="editable text-xl text-white bg-slate-700 rounded-md text-center w-20">10</div>
+                        </div>
+                    </div>
+                    <div class="mana-bar-container">
+                        <div id="mana-bar" class="mana-bar"></div>
+                    </div>
+                 </div>
+            </div>
+
+            <!-- Inventário -->
+            <div class="card p-6">
+                <h2 class="card-header">INVENTÁRIO</h2>
+                <table class="w-full inventory-table">
+                    <thead>
+                        <tr class="border-b border-slate-700 text-left">
+                            <th class="p-2">Item</th>
+                            <th class="p-2 w-16 text-center">Qtd</th>
+                            <th class="p-2 w-24">Peso</th>
+                            <th class="p-2 w-10"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventory-body">
+                    </tbody>
+                </table>
+                <button id="add-item-btn" class="mt-4 text-cyan-300 hover:text-cyan-400">+ Adicionar Item</button>
+            </div>
+
+            <!-- Magias -->
+            <div class="card p-6">
+                <h2 class="card-header">GRIMÓRIO DE MAGIAS</h2>
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-400">Truques</h3>
+                        <div id="cantrips" contenteditable="true" class="editable w-full h-24 p-2 bg-slate-900 rounded-md"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-400">Nível 1</h3>
+                        <div id="spells-1" contenteditable="true" class="editable w-full h-24 p-2 bg-slate-900 rounded-md"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notas e História -->
+            <div class="card p-6">
+                <h2 class="card-header">NOTAS & HISTÓRIA</h2>
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-400">Traços de Personalidade</h3>
+                        <div id="personality-traits" contenteditable="true" class="editable w-full h-20 p-2 bg-slate-900 rounded-md"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-400">Ideais, Vínculos e Defeitos</h3>
+                        <div id="ideals-bonds-flaws" contenteditable="true" class="editable w-full h-20 p-2 bg-slate-900 rounded-md"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-400">História do Personagem</h3>
+                        <div id="backstory" contenteditable="true" class="editable w-full h-32 p-2 bg-slate-900 rounded-md"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const profileCard = document.getElementById('profile-card');
+            const profileToggle = document.getElementById('profile-toggle');
+            const profileHeaderTitle = document.getElementById('profile-header-title');
+            
+            const dynamicResourcesContainer = document.getElementById('dynamic-resources-container');
+            const xpCircleProgress = document.getElementById('xp-circle-progress');
+            const xpBonusBarContainer = document.getElementById('xp-bonus-bar-container');
+            const xpBonusBar = document.getElementById('xp-bonus-bar');
+            
+            const circumference = 2 * Math.PI * 68.5; 
+            
+            // --- CÁLCULOS E ATUALIZAÇÕES ---
+            function updateBar(barElement, current, max) {
+                const percentage = Math.max(0, Math.min(100, (current / max) * 100));
+                barElement.style.width = `${percentage}%`;
+            }
+
+            function updateHealthBar() {
+                const currentHpEl = document.getElementById('hp-current');
+                const maxHpEl = document.getElementById('hp-max');
+                const healthBar = document.getElementById('health-bar');
+                
+                const currentHp = parseInt(currentHpEl.innerText) || 0;
+                const maxHp = parseInt(maxHpEl.innerText) || 1;
+                
+                updateBar(healthBar, currentHp, maxHp);
+            }
+
+            function updateManaBar() {
+                const currentMpEl = document.getElementById('mp-current');
+                const maxMpEl = document.getElementById('mp-max');
+                const manaBar = document.getElementById('mana-bar');
+                
+                const currentMp = parseInt(currentMpEl.innerText) || 0;
+                const maxMp = parseInt(maxMpEl.innerText) || 1;
+                
+                updateBar(manaBar, currentMp, maxMp);
+            }
+
+            function updateXpBar() {
+                const currentXpEl = document.getElementById('xp-current');
+                const maxXpEl = document.getElementById('xp-max');
+                const currentXpSideEl = document.getElementById('xp-current-side');
+                const maxXpSideEl = document.getElementById('xp-max-side');
+                const xpBarLinear = document.getElementById('xp-bar');
+
+                let currentXp = parseInt(currentXpEl.innerText) || 0;
+                let maxXp = parseInt(maxXpEl.innerText) || 1;
+                
+                // Lógica para preencher o xp-bonus-bar
+                let bonusXp = 0;
+                if (currentXp > maxXp) {
+                    bonusXp = currentXp - maxXp;
+                    currentXp = maxXp;
+                    xpBonusBarContainer.classList.remove('hidden');
+                } else {
+                    xpBonusBarContainer.classList.add('hidden');
+                }
+
+                // Sincroniza os valores entre os elementos de cima e laterais
+                currentXpSideEl.innerText = parseInt(currentXpEl.innerText) || 0;
+                maxXpSideEl.innerText = maxXp;
+
+                // Atualiza a barra linear (se for o caso de o bônus estar ativo)
+                if (currentXp === maxXp && bonusXp > 0) {
+                     updateBar(xpBarLinear, 100, 100);
+                     updateBar(xpBonusBar, bonusXp, maxXp); // O bônus preenche a nova barra
+                } else {
+                     updateBar(xpBarLinear, currentXp, maxXp);
+                     updateBar(xpBonusBar, 0, maxXp);
+                }
+
+
+                // Atualiza a barra circular
+                // A barra circular também reflete o progresso linear
+                const progress = (parseInt(currentXpEl.innerText) || 0) / maxXp;
+                const offset = circumference * (1 - progress);
+                xpCircleProgress.style.strokeDashoffset = offset;
+
+            }
+            
+            // --- ATUALIZA TÍTULO DO PERFIL ---
+            function updateProfileHeaderTitle() {
+                const charName = document.getElementById('char-name').innerText.trim();
+                if (profileCard.classList.contains('compact-profile')) {
+                    profileHeaderTitle.innerText = charName.toUpperCase() || 'PERFIL';
+                } else {
+                    profileHeaderTitle.innerText = 'PERFIL';
+                }
+            }
+
+            // --- RECURSOS DINÂMICOS ---
+            function createResourceBar(title = 'Novo Recurso', current = 10, max = 10, color = '#67e8f9') {
+                const resourceDiv = document.createElement('div');
+                resourceDiv.className = 'space-y-2';
+                
+                const uniqueId = `resource-${Date.now()}`;
+                
+                resourceDiv.innerHTML = `
+                    <div class="flex justify-between items-center" style="height: 44px !important; background-color: rgba(0, 0, 0, 0.1)">
+                        <div contenteditable="true" class="status-title editable flex-1" data-id="${uniqueId}-title" style="padding-left: 0; flex: 10 2 0%; height: min-content;">${title}</div>
+                        <div style="flex: 1 1 0%; height: 100%; background-color: rgba(0, 0, 0, 0.1)"></div>
+                        <div class="flex items-center gap-2" style="height: 100%; background-color: rgba(0, 0, 0, 0.1)">
+                            <div contenteditable="true" class="editable text-white bg-slate-700 rounded-md text-center w-10 p-0 text-lg" data-id="${uniqueId}-current">${current}</div>
+                            <span class="text-lg">/</span>
+                            <div contenteditable="true" class="editable text-white bg-slate-700 rounded-md text-center w-10 p-0 text-lg" data-id="${uniqueId}-max">${max}</div>
+                        </div>
+                        <button class="remove-resource-btn text-xl hover:text-red-400" data-id="${uniqueId}-remove" style="background-color: #1C2531; height: 100%;">×</button>
+                    </div>
+                    <div class="flex items-center gap-2" style="margin-top: calc(0.1rem * calc(1 - var(--tw-space-y-reverse)));">
+                        <div class="dynamic-bar-container flex-grow">
+                            <div class="dynamic-bar" style="background-color: ${color};"></div>
+                        </div>
+                        <input type="color" class="color-dropper" value="${color}" data-id="${uniqueId}-color">
+                    </div>
+                `;
+                
+                dynamicResourcesContainer.appendChild(resourceDiv);
+                
+                const titleEl = resourceDiv.querySelector(`[data-id="${uniqueId}-title"]`);
+                const currentEl = resourceDiv.querySelector(`[data-id="${uniqueId}-current"]`);
+                const maxEl = resourceDiv.querySelector(`[data-id="${uniqueId}-max"]`);
+                const colorEl = resourceDiv.querySelector(`[data-id="${uniqueId}-color"]`);
+                const barEl = resourceDiv.querySelector('.dynamic-bar');
+                const removeBtn = resourceDiv.querySelector(`[data-id="${uniqueId}-remove"]`);
+                
+                const updateDynamicBar = () => {
+                    const currentVal = parseInt(currentEl.innerText) || 0;
+                    const maxVal = parseInt(maxEl.innerText) || 1;
+                    updateBar(barEl, currentVal, maxVal);
+                    saveData();
+                };
+
+                titleEl.addEventListener('input', saveData);
+                currentEl.addEventListener('input', updateDynamicBar);
+                maxEl.addEventListener('input', updateDynamicBar);
+                
+                colorEl.addEventListener('input', (event) => {
+                    barEl.style.backgroundColor = event.target.value;
+                    saveData();
+                });
+                
+                removeBtn.addEventListener('click', () => {
+                    resourceDiv.remove();
+                    saveData();
+                });
+
+                updateDynamicBar();
+            }
+
+            // --- ARMAZENAMENTO LOCAL ---
+            function saveData() {
+                const data = {};
+                const editableElements = document.querySelectorAll('[contenteditable="true"]');
+                editableElements.forEach(element => {
+                    if (element.id) {
+                         data[element.id] = element.innerHTML;
+                    }
+                });
+                
+                const inventory = [];
+                document.querySelectorAll('#inventory-body tr').forEach(row => {
+                    inventory.push({
+                        item: row.cells[0].innerText,
+                        qty: row.cells[1].innerText,
+                        weight: row.cells[2].innerText,
+                    });
+                });
+                data['inventory'] = inventory;
+
+                const dynamicResources = [];
+                dynamicResourcesContainer.querySelectorAll('.space-y-2').forEach(resourceDiv => {
+                    const title = resourceDiv.querySelector('.status-title').innerText;
+                    const current = resourceDiv.querySelector('[data-id*="-current"]').innerText;
+                    const max = resourceDiv.querySelector('[data-id*="-max"]').innerText;
+                    const color = resourceDiv.querySelector('input[type="color"]').value;
+                    dynamicResources.push({ title, current, max, color });
+                });
+                data['dynamicResources'] = dynamicResources;
+
+                const avatarDiv = document.getElementById('avatar');
+                if (avatarDiv.style.backgroundImage) {
+                    data['avatar-bg'] = avatarDiv.style.backgroundImage;
+                }
+                
+                // Salva o estado do layout
+                data['layout-compact'] = profileCard.classList.contains('compact-profile');
+
+                localStorage.setItem('characterSheetDataV7', JSON.stringify(data));
+            }
+
+            function loadData() {
+                const data = JSON.parse(localStorage.getItem('characterSheetDataV7'));
+                if (!data) return;
+
+                const editableElements = document.querySelectorAll('[contenteditable="true"]');
+                editableElements.forEach(element => {
+                    if (element.id && data[element.id] !== undefined) {
+                        element.innerHTML = data[element.id];
+                    }
+                });
+
+                if (data.inventory) {
+                    const inventoryBody = document.getElementById('inventory-body');
+                    inventoryBody.innerHTML = '';
+                    data.inventory.forEach(itemData => createInventoryRow(itemData.item, itemData.qty, itemData.weight));
+                }
+                
+                if (data.dynamicResources) {
+                    dynamicResourcesContainer.innerHTML = '';
+                    data.dynamicResources.forEach(resource => createResourceBar(resource.title, resource.current, resource.max, resource.color));
+                }
+                
+                if (data['avatar-bg']) {
+                    const avatarDiv = document.getElementById('avatar');
+                    avatarDiv.style.backgroundImage = data['avatar-bg'];
+                    avatarDiv.innerHTML = '';
+                }
+
+                // Carrega o estado do layout
+                if (data['layout-compact']) {
+                    profileCard.classList.add('compact-profile');
+                    document.getElementById('xp-numbers-top').classList.add('hidden');
+                    document.getElementById('xp-numbers-side').classList.remove('hidden');
+                } else {
+                    profileCard.classList.remove('compact-profile');
+                    document.getElementById('xp-numbers-top').classList.remove('hidden');
+                    document.getElementById('xp-numbers-side').classList.add('hidden');
+                }
+
+                updateHealthBar();
+                updateManaBar();
+                updateXpBar();
+                updateProfileHeaderTitle(); // Chamada para atualizar o título após carregar os dados
+            }
+            
+            // --- INVENTÁRIO ---
+            function createInventoryRow(item = '', qty = '1', weight = '0') {
+                const inventoryBody = document.getElementById('inventory-body');
+                const row = document.createElement('tr');
+                row.className = 'border-b border-slate-800';
+                row.innerHTML = `
+                    <td class="p-2"><div contenteditable="true" class="editable">${item}</div></td>
+                    <td class="p-2 text-center"><div contenteditable="true" class="editable">${qty}</div></td>
+                    <td class="p-2"><div contenteditable="true" class="editable">${weight}</div></td>
+                    <td class="p-2 text-center"><button class="remove-item-btn text-lg hover:text-red-400">X</button></td>
+                `;
+                inventoryBody.appendChild(row);
+                row.querySelector('.remove-item-btn').addEventListener('click', () => {
+                    row.remove();
+                    saveData();
+                });
+                row.querySelectorAll('[contenteditable]').forEach(el => el.addEventListener('input', saveData));
+            }
+
+            // --- EVENT LISTENERS ---
+            document.querySelectorAll('[contenteditable="true"]').forEach(element => {
+                element.addEventListener('input', saveData);
+            });
+            
+            document.getElementById('hp-current').addEventListener('input', updateHealthBar);
+            document.getElementById('hp-max').addEventListener('input', updateHealthBar);
+            document.getElementById('mp-current').addEventListener('input', updateManaBar);
+            document.getElementById('mp-max').addEventListener('input', updateManaBar);
+
+            document.getElementById('xp-current').addEventListener('input', updateXpBar);
+            document.getElementById('xp-max').addEventListener('input', updateXpBar);
+            document.getElementById('xp-current-side').addEventListener('input', updateXpBar);
+            document.getElementById('xp-max-side').addEventListener('input', updateXpBar);
+            document.getElementById('level').addEventListener('input', saveData);
+            document.getElementById('char-race').addEventListener('input', saveData);
+            document.getElementById('char-class').addEventListener('input', saveData);
+            document.getElementById('char-age').addEventListener('input', saveData);
+            document.getElementById('char-height').addEventListener('input', saveData);
+            document.getElementById('char-powers').addEventListener('input', saveData);
+            
+            // Adicionado evento para atualizar o título quando o nome do personagem for alterado
+            document.getElementById('char-name').addEventListener('input', updateProfileHeaderTitle);
+
+            document.getElementById('add-resource-btn').addEventListener('click', () => createResourceBar());
+            
+            // Avatar
+            const avatarDiv = document.getElementById('avatar');
+            const avatarInput = document.getElementById('avatar-input');
+            avatarDiv.addEventListener('click', () => avatarInput.click());
+            avatarInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        avatarDiv.style.backgroundImage = `url('${e.target.result}')`;
+                        avatarDiv.innerHTML = '';
+                        saveData();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Inventário
+            document.getElementById('add-item-btn').addEventListener('click', () => createInventoryRow());
+
+            // Profile Toggle
+            profileToggle.addEventListener('click', () => {
+                profileCard.classList.toggle('compact-profile');
+                const isCompact = profileCard.classList.contains('compact-profile');
+                document.getElementById('xp-numbers-top').classList.toggle('hidden', isCompact);
+                document.getElementById('xp-numbers-side').classList.toggle('hidden', !isCompact);
+                updateProfileHeaderTitle(); // Chamada para atualizar o título
+                saveData(); // Salva o novo estado do layout
+            });
+
+            // --- INICIALIZAÇÃO ---
+            loadData();
+            updateHealthBar();
+            updateManaBar();
+            updateXpBar();
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha de Personagem - Edição Aprimorada</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;600&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #111827;
+            --bg-card: #1f2937;
+            --border-color: #374151;
+            --text-primary: #d1d5db;
+            --text-secondary: #9ca3af;
+            --text-title: #f9fafb;
+            --accent-color: #67e8f9;
+            --accent-color-dark: #0e7490;
+            --danger-color: #ef4444;
+        }
+        body {
+            background-color: var(--bg-main);
+            font-family: 'Roboto', sans-serif;
+            color: var(--text-primary);
+        }
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            font-family: 'Teko', sans-serif;
+            font-size: 1.75rem;
+            letter-spacing: 0.05em;
+            color: var(--accent-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .editable {
+            background-color: rgba(0,0,0,0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            min-height: 1.75rem;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            outline: none;
+            width: 100%;
+        }
+        .editable:focus {
+            background-color: var(--border-color);
+            box-shadow: 0 0 0 2px var(--accent-color);
+        }
+        .stat-box {
+            background-color: var(--border-color);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            text-align: center;
+        }
+        .stat-label {
+            font-family: 'Teko', sans-serif;
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+        }
+        .stat-value {
+            font-size: 2.25rem;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--text-title);
+        }
+        .avatar {
+            width: 150px;
+            height: 150px;
+            background-color: var(--border-color);
+            border: 2px dashed #4b5563;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            background-size: cover;
+            background-position: center;
+            transition: border-color 0.2s;
+        }
+        .avatar:hover {
+            border-color: var(--accent-color);
+        }
+        .health-bar-container {
+            background-color: #4b5563;
+            border-radius: 0.25rem;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        .health-bar {
+            background-color: var(--danger-color);
+            height: 1.25rem;
+            width: 100%;
+            transition: width 0.5s ease-in-out;
+        }
+        .resource-tracker {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .resource-btn {
+            background-color: var(--border-color);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            color: var(--text-primary);
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .resource-btn:hover {
+            background-color: var(--accent-color-dark);
+        }
+        .inventory-table .editable {
+            background-color: transparent;
+        }
+        .inventory-table .editable:focus {
+            background-color: var(--bg-main);
+        }
+        .inventory-table button {
+            color: var(--danger-color);
+            visibility: hidden;
+        }
+        .inventory-table tr:hover button {
+            visibility: visible;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 lg:p-8">
+
+    <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Coluna da Esquerda -->
+        <div class="lg:col-span-1 flex flex-col gap-6">
+            <!-- Card Principal -->
+            <div class="card p-6 flex flex-col items-center">
+                <div id="avatar" class="avatar mb-4">
+                    <span>Clique para<br>adicionar imagem</span>
+                    <input type="file" id="avatar-input" class="hidden" accept="image/*">
+                </div>
+                <div class="w-full text-center">
+                    <div id="char-name" contenteditable="true" class="editable text-4xl font-bold text-white" style="font-family: 'Teko', sans-serif;">NOME DO PERSONAGEM</div>
+                    <div id="char-details" contenteditable="true" class="editable text-lg text-gray-400">Classe, Nível e Raça</div>
+                </div>
+            </div>
+
+            <!-- Atributos -->
+            <div class="card p-6">
+                <h2 class="card-header">ATRIBUTOS</h2>
+                <div class="grid grid-cols-3 gap-4">
+                    <!-- Força -->
+                    <div class="stat-box">
+                        <div class="stat-label">FOR</div>
+                        <div id="str-score" contenteditable="true" class="editable stat-value">10</div>
+                        <div id="str-mod" class="font-bold text-lg">(+0)</div>
+                    </div>
+                    <!-- Destreza -->
+                    <div class="stat-box">
+                        <div class="stat-label">DES</div>
+                        <div id="dex-score" contenteditable="true" class="editable stat-value">10</div>
+                        <div id="dex-mod" class="font-bold text-lg">(+0)</div>
+                    </div>
+                    <!-- Constituição -->
+                    <div class="stat-box">
+                        <div class="stat-label">CON</div>
+                        <div id="con-score" contenteditable="true" class="editable stat-value">10</div>
+                        <div id="con-mod" class="font-bold text-lg">(+0)</div>
+                    </div>
+                    <!-- Inteligência -->
+                    <div class="stat-box">
+                        <div class="stat-label">INT</div>
+                        <div id="int-score" contenteditable="true" class="editable stat-value">10</div>
+                        <div id="int-mod" class="font-bold text-lg">(+0)</div>
+                    </div>
+                    <!-- Sabedoria -->
+                    <div class="stat-box">
+                        <div class="stat-label">SAB</div>
+                        <div id="wis-score" contenteditable="true" class="editable stat-value">10</div>
+                        <div id="wis-mod" class="font-bold text-lg">(+0)</div>
+                    </div>
+                    <!-- Carisma -->
+                    <div class="stat-box">
+                        <div class="stat-label">CAR</div>
+                        <div id="cha-score" contenteditable="true" class="editable stat-value">10</div>
+                        <div id="cha-mod" class="font-bold text-lg">(+0)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status e Recursos -->
+            <div class="card p-6">
+                <h2 class="card-header">STATUS & RECURSOS</h2>
+                <div class="space-y-4">
+                    <!-- Inspiração -->
+                    <div class="flex justify-between items-center">
+                        <span class="text-lg">Pontos de Inspiração</span>
+                        <div class="resource-tracker">
+                            <button class="resource-btn" data-resource="inspiration" data-action="decrease">-</button>
+                            <div id="inspiration-points" class="text-xl font-bold">0</div>
+                            <button class="resource-btn" data-resource="inspiration" data-action="increase">+</button>
+                        </div>
+                    </div>
+                    <!-- Dados de Vida -->
+                    <div class="flex justify-between items-center">
+                        <span class="text-lg">Dados de Vida</span>
+                        <div class="resource-tracker">
+                            <button class="resource-btn" data-resource="hitdice" data-action="decrease">-</button>
+                            <div id="hit-dice" contenteditable="true" class="editable text-center max-w-[80px]">1d8</div>
+                            <button class="resource-btn" data-resource="hitdice" data-action="increase">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna Central e Direita -->
+        <div class="lg:col-span-2 flex flex-col gap-6">
+            <!-- Status de Combate -->
+            <div class="card p-6">
+                 <h2 class="card-header">COMBATE</h2>
+                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="stat-box">
+                        <div class="stat-label">ARMADURA</div>
+                        <div id="ac" contenteditable="true" class="editable stat-value">10</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">INICIATIVA</div>
+                        <div id="initiative" contenteditable="true" class="editable stat-value">+0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">VELOCIDADE</div>
+                        <div id="speed" contenteditable="true" class="editable stat-value">9m</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">BÔNUS PROF.</div>
+                        <div id="proficiency" contenteditable="true" class="editable stat-value">+2</div>
+                    </div>
+                 </div>
+                 <div class="mt-6">
+                    <div class="flex justify-between items-end mb-1">
+                        <h3 class="font-bold text-lg">PONTOS DE VIDA</h3>
+                        <div class="flex items-center gap-2">
+                            <div id="hp-current" contenteditable="true" class="editable text-xl text-white bg-slate-700 rounded-md text-center w-20">10</div>
+                            <span class="text-xl">/</span>
+                            <div id="hp-max" contenteditable="true" class="editable text-xl text-white bg-slate-700 rounded-md text-center w-20">10</div>
+                        </div>
+                    </div>
+                    <div class="health-bar-container">
+                        <div id="health-bar" class="health-bar"></div>
+                    </div>
+                 </div>
+            </div>
+            
+            <!-- Inventário -->
+            <div class="card p-6">
+                <h2 class="card-header">INVENTÁRIO</h2>
+                <table class="w-full inventory-table">
+                    <thead>
+                        <tr class="border-b border-slate-700 text-left">
+                            <th class="p-2">Item</th>
+                            <th class="p-2 w-16 text-center">Qtd</th>
+                            <th class="p-2 w-24">Peso</th>
+                            <th class="p-2 w-10"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventory-body">
+                        <!-- Itens serão adicionados aqui -->
+                    </tbody>
+                </table>
+                <button id="add-item-btn" class="mt-4 text-cyan-300 hover:text-cyan-400">+ Adicionar Item</button>
+            </div>
+
+            <!-- Magias -->
+            <div class="card p-6">
+                <h2 class="card-header">GRIMÓRIO DE MAGIAS</h2>
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-400">Truques</h3>
+                        <div id="cantrips" contenteditable="true" class="editable w-full h-24 p-2 bg-slate-900 rounded-md"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-400">Nível 1</h3>
+                        <div id="spells-1" contenteditable="true" class="editable w-full h-24 p-2 bg-slate-900 rounded-md"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Talentos, História, etc. -->
+            <div class="card p-6">
+                <h2 class="card-header">NOTAS & HISTÓRIA</h2>
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-400">Traços de Personalidade</h3>
+                        <div id="personality-traits" contenteditable="true" class="editable w-full h-20 p-2 bg-slate-900 rounded-md"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-400">Ideais, Vínculos e Defeitos</h3>
+                        <div id="ideals-bonds-flaws" contenteditable="true" class="editable w-full h-20 p-2 bg-slate-900 rounded-md"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-400">História do Personagem</h3>
+                        <div id="backstory" contenteditable="true" class="editable w-full h-32 p-2 bg-slate-900 rounded-md"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const editableElements = document.querySelectorAll('[contenteditable="true"]');
+            const allEditableIds = Array.from(editableElements).map(el => el.id).filter(Boolean);
+
+            // --- CÁLCULOS E ATUALIZAÇÕES ---
+            function calculateModifier(score) {
+                const mod = Math.floor((parseInt(score, 10) - 10) / 2);
+                return mod >= 0 ? `+${mod}` : mod;
+            }
+
+            function updateAllModifiers() {
+                const attributes = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
+                attributes.forEach(attr => {
+                    const scoreEl = document.getElementById(`${attr}-score`);
+                    const modEl = document.getElementById(`${attr}-mod`);
+                    if (scoreEl && modEl) {
+                        const score = parseInt(scoreEl.innerText, 10) || 10;
+                        modEl.innerText = `(${calculateModifier(score)})`;
+                    }
+                });
+            }
+
+            function updateHealthBar() {
+                const currentHpEl = document.getElementById('hp-current');
+                const maxHpEl = document.getElementById('hp-max');
+                const healthBar = document.getElementById('health-bar');
+                
+                const currentHp = parseInt(currentHpEl.innerText) || 0;
+                const maxHp = parseInt(maxHpEl.innerText) || 1;
+                
+                const percentage = Math.max(0, Math.min(100, (currentHp / maxHp) * 100));
+                healthBar.style.width = `${percentage}%`;
+            }
+
+            // --- ARMAZENAMENTO LOCAL ---
+            function saveData() {
+                const data = {};
+                allEditableIds.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        data[id] = element.innerHTML;
+                    }
+                });
+                
+                // Salvar inventário
+                const inventory = [];
+                document.querySelectorAll('#inventory-body tr').forEach(row => {
+                    inventory.push({
+                        item: row.cells[0].innerText,
+                        qty: row.cells[1].innerText,
+                        weight: row.cells[2].innerText,
+                    });
+                });
+                data['inventory'] = inventory;
+
+                // Salvar avatar
+                const avatarDiv = document.getElementById('avatar');
+                if (avatarDiv.style.backgroundImage) {
+                    data['avatar-bg'] = avatarDiv.style.backgroundImage;
+                }
+
+                localStorage.setItem('characterSheetDataV2', JSON.stringify(data));
+            }
+
+            function loadData() {
+                const data = JSON.parse(localStorage.getItem('characterSheetDataV2'));
+                if (!data) return;
+
+                allEditableIds.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element && data[id]) {
+                        element.innerHTML = data[id];
+                    }
+                });
+
+                // Carregar inventário
+                if (data.inventory) {
+                    const inventoryBody = document.getElementById('inventory-body');
+                    inventoryBody.innerHTML = '';
+                    data.inventory.forEach(itemData => createInventoryRow(itemData.item, itemData.qty, itemData.weight));
+                }
+                
+                // Carregar avatar
+                if (data['avatar-bg']) {
+                    const avatarDiv = document.getElementById('avatar');
+                    avatarDiv.style.backgroundImage = data['avatar-bg'];
+                    avatarDiv.innerHTML = '';
+                }
+
+                updateAllModifiers();
+                updateHealthBar();
+            }
+            
+            // --- INVENTÁRIO ---
+            function createInventoryRow(item = '', qty = '1', weight = '0') {
+                const inventoryBody = document.getElementById('inventory-body');
+                const row = document.createElement('tr');
+                row.className = 'border-b border-slate-800';
+                row.innerHTML = `
+                    <td class="p-2"><div contenteditable="true" class="editable">${item}</div></td>
+                    <td class="p-2 text-center"><div contenteditable="true" class="editable">${qty}</div></td>
+                    <td class="p-2"><div contenteditable="true" class="editable">${weight}</div></td>
+                    <td class="p-2 text-center"><button class="remove-item-btn">X</button></td>
+                `;
+                inventoryBody.appendChild(row);
+                row.querySelector('.remove-item-btn').addEventListener('click', () => {
+                    row.remove();
+                    saveData();
+                });
+                row.querySelectorAll('[contenteditable]').forEach(el => el.addEventListener('input', saveData));
+            }
+
+            // --- EVENT LISTENERS ---
+            editableElements.forEach(element => {
+                element.addEventListener('input', saveData);
+            });
+            
+            document.querySelectorAll('[id$="-score"]').forEach(el => el.addEventListener('input', updateAllModifiers));
+            document.getElementById('hp-current').addEventListener('input', updateHealthBar);
+            document.getElementById('hp-max').addEventListener('input', updateHealthBar);
+            
+            // Avatar
+            const avatarDiv = document.getElementById('avatar');
+            const avatarInput = document.getElementById('avatar-input');
+            avatarDiv.addEventListener('click', () => avatarInput.click());
+            avatarInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        avatarDiv.style.backgroundImage = `url('${e.target.result}')`;
+                        avatarDiv.innerHTML = '';
+                        saveData();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Rastreadores de Recursos
+            document.querySelectorAll('.resource-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const resource = btn.dataset.resource;
+                    const action = btn.dataset.action;
+                    const el = document.getElementById(`${resource}-points`);
+                    if (el) {
+                        let value = parseInt(el.innerText) || 0;
+                        if (action === 'increase') value++;
+                        if (action === 'decrease') value = Math.max(0, value - 1);
+                        el.innerText = value;
+                        saveData();
+                    }
+                });
+            });
+            
+            // Inventário
+            document.getElementById('add-item-btn').addEventListener('click', () => createInventoryRow());
+
+            // --- INICIALIZAÇÃO ---
+            loadData();
+            updateAllModifiers();
+            updateHealthBar();
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,461 @@
+@font-face {
+    font-family: Teko;
+    font-style: normal;
+    font-weight: 400;
+    src: url(/cf-fonts/v/teko/5.0.18/latin/wght/normal.woff2);
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    font-display: swap;
+}
+@font-face {
+    font-family: Teko;
+    font-style: normal;
+    font-weight: 400;
+    src: url(/cf-fonts/v/teko/5.0.18/latin-ext/wght/normal.woff2);
+    unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    font-display: swap;
+}
+@font-face {
+    font-family: Teko;
+    font-style: normal;
+    font-weight: 400;
+    src: url(/cf-fonts/v/teko/5.0.18/devanagari/wght/normal.woff2);
+    unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF;
+    font-display: swap;
+}
+@font-face {
+    font-family: Teko;
+    font-style: normal;
+    font-weight: 600;
+    src: url(/cf-fonts/v/teko/5.0.18/devanagari/wght/normal.woff2);
+    unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF;
+    font-display: swap;
+}
+@font-face {
+    font-family: Teko;
+    font-style: normal;
+    font-weight: 600;
+    src: url(/cf-fonts/v/teko/5.0.18/latin-ext/wght/normal.woff2);
+    unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    font-display: swap;
+}
+@font-face {
+    font-family: Teko;
+    font-style: normal;
+    font-weight: 600;
+    src: url(/cf-fonts/v/teko/5.0.18/latin/wght/normal.woff2);
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    font-display: swap;
+}
+@font-face {
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: 400;
+    src: url(/cf-fonts/s/roboto/5.0.11/latin-ext/400/normal.woff2);
+    unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    font-display: swap;
+}
+@font-face {
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: 400;
+    src: url(/cf-fonts/s/roboto/5.0.11/vietnamese/400/normal.woff2);
+    unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+    font-display: swap;
+}
+@font-face {
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: 400;
+    src: url(/cf-fonts/s/roboto/5.0.11/cyrillic-ext/400/normal.woff2);
+    unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+    font-display: swap;
+}
+@font-face {
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: 400;
+    src: url(/cf-fonts/s/roboto/5.0.11/greek/400/normal.woff2);
+    unicode-range: U+0370-03FF;
+    font-display: swap;
+}
+@font-face {
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: 400;
+    src: url(/cf-fonts/s/roboto/5.0.11/cyrillic/400/normal.woff2);
+    unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+    font-display: swap;
+}
+@font-face {
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: 400;
+    src: url(/cf-fonts/s/roboto/5.0.11/greek-ext/400/normal.woff2);
+    unicode-range: U+1F00-1FFF;
+    font-display: swap;
+}
+@font-face {
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: 400;
+    src: url(/cf-fonts/s/roboto/5.0.11/latin/400/normal.woff2);
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    font-display: swap;
+}
+@font-face {
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: 700;
+    src: url(/cf-fonts/s/roboto/5.0.11/cyrillic/700/normal.woff2);
+    unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+    font-display: swap;
+}
+@font-face {
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: 700;
+    src: url(/cf-fonts/s/roboto/5.0.11/greek-ext/700/normal.woff2);
+    unicode-range: U+1F00-1FFF;
+    font-display: swap;
+}
+@font-face {
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: 700;
+    src: url(/cf-fonts/s/roboto/5.0.11/latin-ext/700/normal.woff2);
+    unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    font-display: swap;
+}
+@font-face {
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: 700;
+    src: url(/cf-fonts/s/roboto/5.0.11/vietnamese/700/normal.woff2);
+    unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+    font-display: swap;
+}
+@font-face {
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: 700;
+    src: url(/cf-fonts/s/roboto/5.0.11/latin/700/normal.woff2);
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    font-display: swap;
+}
+@font-face {
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: 700;
+    src: url(/cf-fonts/s/roboto/5.0.11/cyrillic-ext/700/normal.woff2);
+    unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+    font-display: swap;
+}
+@font-face {
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: 700;
+    src: url(/cf-fonts/s/roboto/5.0.11/greek/700/normal.woff2);
+    unicode-range: U+0370-03FF;
+    font-display: swap;
+}
+:root {
+    --bg-main: #111827;
+    --bg-card: #1f2937;
+    --border-color: #374151;
+    --text-primary: #d1d5db;
+    --text-secondary: #9ca3af;
+    --text-title: #f9fafb;
+    --accent-color: #67e8f9;
+    --accent-color-dark: #0e7490;
+    --danger-color: #ef4444;
+    --mana-color: #3b82f6;
+    --xp-color: #FFD700;
+    --xp-bonus-color: #f9fafb;
+}
+body {
+    background-color: var(--bg-main);
+    font-family: 'Roboto', sans-serif;
+    color: var(--text-primary);
+}
+.card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+.card .redimensao {
+    resize: vertical;
+}
+.card-header {
+    font-family: 'Teko', sans-serif;
+    font-size: 1.75rem;
+    letter-spacing: 0.05em;
+    color: var(--accent-color);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+.editable {
+    background-color: rgba(0,0,0,0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    min-height: 1.75rem;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    width: 100%;
+}
+.editable:focus {
+    background-color: var(--border-color);
+    box-shadow: 0 0 0 2px var(--accent-color);
+}
+.stat-box {
+    background-color: var(--border-color);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    text-align: center;
+}
+.stat-label {
+    font-family: 'Teko', sans-serif;
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+}
+.stat-value {
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--text-title);
+}
+.avatar-xp-wrapper {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    margin: 0 auto;
+    transition: all 0.5s ease-in-out;
+}
+.avatar {
+    width: 140px;
+    height: 140px;
+    background-color: var(--border-color);
+    border: 2px dashed #4b5563;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    background-size: cover;
+    background-position: center;
+    transition: all 0.5s ease-in-out;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.avatar:hover {
+    border-color: var(--accent-color);
+}
+.health-bar-container, .mana-bar-container, .dynamic-bar-container, .xp-bonus-bar-container {
+    background-color: #4b5563;
+    border-radius: 0.25rem;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+.health-bar {
+    background-color: var(--danger-color);
+    height: 1.25rem;
+    width: 100%;
+    transition: width 0.5s ease-in-out;
+    justify-self: flex-end;
+}
+.mana-bar {
+    background-color: var(--mana-color);
+    height: 1.25rem;
+    width: 100%;
+    transition: width 0.5s ease-in-out;
+}
+.dynamic-bar {
+    height: 1.25rem;
+    width: 100%;
+    transition: width 0.5s ease-in-out;
+    background-color: var(--custom-color, #67e8f9);
+}
+.xp-bonus-bar {
+    height: 0.5rem;
+    width: 100%;
+    transition: width 0.5s ease-in-out;
+    background-color: var(--xp-bonus-color);
+}
+.inventory-table .editable {
+    background-color: transparent;
+}
+.inventory-table .editable:focus {
+    background-color: var(--bg-main);
+}
+.inventory-table button {
+    color: var(--danger-color);
+    visibility: hidden;
+}
+.inventory-table tr:hover button {
+    visibility: visible;
+}
+.status-title {
+    font-family: 'Teko', sans-serif;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent-color);
+}
+::-webkit-scrollbar {
+    width: 8px;
+    background-color: var(--bg-main);
+}
+::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 10px;
+    border: 2px solid var(--bg-card);
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--accent-color);
+}
+* {
+    scrollbar-color: var(--border-color) var(--bg-main);
+    scrollbar-width: thin;
+}
+.remove-resource-btn {
+    color: var(--danger-color);
+    padding: 0 6.6615px 0 calc(6.6615px + 0.5rem);
+}
+.remove-resource-btn:hover {
+    color: #fca5a5;
+}
+.color-dropper {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+.color-dropper::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+.color-dropper::-webkit-color-swatch {
+    border: none;
+    border-radius: 50%;
+}
+.color-dropper::-moz-color-swatch {
+    border: none;
+    border-radius: 50%;
+}
+.profile-xp-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 180px;
+    height: 180px;
+    transition: all 0.5s ease-in-out;
+}
+#xp-circle-progress {
+    transition: stroke-dashoffset 0.5s ease-in-out;
+    stroke-linecap: round;
+}
+#profile-toggle {
+    position: absolute;
+    top: 2rem;
+    right: 0.5rem;
+    width: 0.1rem;
+    height: 14rem;
+    background-color: var(--accent-color);
+    border-radius: 0.125rem;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s ease-in-out;
+}
+#profile-toggle:hover {
+    width: 0.4rem;
+}
+.card.compact-profile .profile-content {
+    flex-direction: column;
+    align-items: flex-start;
+}
+.card.compact-profile .profile-top-section {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 1rem;
+    width: 100%;
+}
+.card.compact-profile .avatar-xp-wrapper {
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+    margin: 0;
+}
+.card.compact-profile .avatar {
+    width: 90px;
+    height: 90px;
+    border-width: 1px;
+}
+.card.compact-profile .avatar-xp-wrapper svg {
+    width: 100%;
+    height: 100%;
+}
+.card.compact-profile #xp-title {
+    display: none;
+}
+.card.compact-profile .xp-numbers {
+    margin-top: 0;
+    display: flex;
+}
+#xp-current-side, #xp-max-side {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 13px; /* Ajusta este valor conforme a tua preferência */
+    padding-top: 0;
+    padding-bottom: 0;
+}
+#xp-current-side.bg-slate-700, #xp-max-side.bg-slate-700 {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+#xp-current-side, #xp-max-side, #xp-numbers-side .text-xs {
+    bottom: -5px;
+    position: relative;
+}
+#xp-numbers-side .editable {
+    min-height: 1.3rem;
+}
+.card.compact-profile .xp-bar-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-grow: 1;
+}
+.card.compact-profile .xp-bar-text-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-bottom: 0;
+    margin-bottom: 0.5rem;
+    border: none;
+}
+.card.compact-profile #xp-numbers-top, .card.compact-profile #xp-numbers-side {
+    gap: 0.5rem;
+}
+.xp-bonus-bar-container {
+    height: 0.5rem;
+    background-color: #4b5563;
+    border-radius: 0.25rem;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    margin-top: 0.5rem;
+}
+.xp-bonus-bar-container.hidden {
+    display: none;
+}
