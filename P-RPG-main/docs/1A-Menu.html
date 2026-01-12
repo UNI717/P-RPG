@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interface Futurista</title>
+  <link rel="stylesheet" href="1A-Menu.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1E1E2F',
+            secondary: '#28283D',
+            accent: '#262626',
+            highlight: '#0F0F0F',
+            textLight: '#F0F0F0',
+            textDark: '#333333',
+            icon: '#9CA3AF',
+            activeIcon: '#E5E7EB',
+            activeBg: '#1B1B1B',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          animation: {
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-gray-100 dark:bg-primary text-textDark dark:text-textLight transition-colors duration-500">
+
+  <div class="flex h-screen p-4 gap-4">
+
+    <!-- Sidebar -->
+    <aside id="sidebar"
+      class="w-64 flex-shrink-0 bg-accent flex flex-col justify-between shadow-2xl transition-all duration-300 ease-in-out z-10 rounded-3xl p-6">
+      <div>
+        <div id="sidebar-header" class="flex items-center justify-center space-x-2 py-2 mb-8 cursor-pointer">
+          <svg class="w-6 h-6 text-white transition-transform duration-300" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.977 5.002 5.002 0 00-9.9 0A3 3 0 003 15z"></path>
+          </svg>
+          <span class="sidebar-text text-white text-xl font-bold transition-opacity duration-300">RPG -
+            Multiversal</span>
+        </div>
+
+        <!-- Navegação -->
+        <nav class="flex flex-col space-y-2">
+          <!-- Personagens (ativo de início) -->
+          <a href="#" id="btn-personagens"
+            class="sidebar-item flex items-center py-3 px-4 rounded-xl hover:bg-highlight group transition-colors duration-300 bg-highlight">
+            <svg class="w-6 h-6 mr-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+            </svg>
+            <span class="sidebar-text nav-text font-medium">Personagens</span>
+          </a>
+
+          <!-- Elementos -->
+          <a href="#" id="btn-elementos"
+            class="sidebar-item flex items-center py-3 px-4 rounded-xl hover:bg-highlight group transition-colors duration-300">
+            <svg class="w-6 h-6 text-icon mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+            </svg>
+            <span class="sidebar-text nav-text font-medium text-icon">Elementos</span>
+          </a>
+
+          <!-- Cartas -->
+          <a href="#" id="btn-cartas"
+            class="sidebar-item flex items-center py-3 px-4 rounded-xl hover:bg-highlight group transition-colors duration-300">
+            <svg class="w-6 h-6 text-icon mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12h6m-6 4h6M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+            </svg>
+            <span class="sidebar-text nav-text font-medium text-icon">Cartas</span>
+          </a>
+
+          <!-- Atributos -->
+          <a href="#" id="btn-atributos"
+            class="sidebar-item flex items-center py-3 px-4 rounded-xl hover:bg-highlight group transition-colors duration-300">
+            <svg class="w-6 h-6 text-icon mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m-6-6h12"></path>
+            </svg>
+            <span class="sidebar-text nav-text font-medium text-icon">Atributos</span>
+          </a>
+
+          <!-- Mapa -->
+          <a href="#" id="btn-mapa"
+            class="sidebar-item flex items-center py-3 px-4 rounded-xl hover:bg-highlight group transition-colors duration-300">
+            <svg class="w-6 h-6 text-icon mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3V6zm6-3v15m6-12v15"></path>
+            </svg>
+            <span class="sidebar-text nav-text font-medium text-icon">Mapa</span>
+          </a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Conteúdos -->
+    <main
+      class="flex-1 overflow-y-auto bg-white dark:bg-primary text-textDark dark:text-textLight rounded-3xl transition-all duration-300 h-full">
+
+      <!-- Personagens (visível logo ao carregar) -->
+      <div id="conteudo-personagens" class="w-full h-full">
+        <iframe src="Ficha de Personagem/4A-Ficha-de-Personagem.html/4A-Ficha-de-Personagem.html"
+          class="w-full h-full border-0 rounded-3xl" frameborder="0" allowfullscreen></iframe>
+      </div>
+
+      <!-- Elementos -->
+      <div id="conteudo-elementos" class="hidden w-full h-full">
+        <iframe src="Vantagens Elementais/4A-Mapa-Mental-de-Vantagem-Elemental.html"
+          class="w-full h-full border-0 rounded-3xl" frameborder="0" allowfullscreen></iframe>
+      </div>
+
+      <!-- Cartas -->
+      <div id="conteudo-cartas" class="hidden w-full h-full">
+        <iframe src="Cards/4A-Cards.html" class="w-full h-full border-0 rounded-3xl" frameborder="0"
+          allowfullscreen></iframe>
+      </div>
+
+      <!-- Atributos -->
+      <div id="conteudo-atributos" class="hidden w-full h-full">
+        <iframe src="Atributo X Atributo/2A-Calculo-de-AxA.html" class="w-full h-full border-0 rounded-3xl"
+          frameborder="0" allowfullscreen></iframe>
+      </div>
+
+      <!-- Mapa -->
+      <div id="conteudo-mapa" class="hidden w-full h-full">
+        <iframe src="Mapa/Dakons Map.html" class="w-full h-full border-0 rounded-3xl" frameborder="0"
+          allowfullscreen></iframe>
+      </div>
+    </main>
+  </div>
+
+  <script src="1A-Menu.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const botoes = document.querySelectorAll(".sidebar-item");
+      const secoes = {
+        "btn-personagens": "conteudo-personagens",
+        "btn-elementos": "conteudo-elementos",
+        "btn-cartas": "conteudo-cartas",
+        "btn-atributos": "conteudo-atributos",
+        "btn-mapa": "conteudo-mapa"
+      };
+
+      // Sempre iniciar em Personagens
+      document.getElementById("conteudo-personagens").classList.remove("hidden");
+
+      botoes.forEach(botao => {
+        botao.addEventListener("click", e => {
+          e.preventDefault();
+
+          // Desmarcar todos
+          botoes.forEach(b => {
+            b.classList.remove("bg-highlight");
+            b.querySelector("svg").classList.remove("text-activeIcon");
+            b.querySelector("span").classList.remove("text-activeIcon");
+            b.querySelector("svg").classList.add("text-icon");
+            b.querySelector("span").classList.add("text-icon");
+          });
+
+          // Esconder todas as seções
+          Object.values(secoes).forEach(id => {
+            document.getElementById(id)?.classList.add("hidden");
+          });
+
+          // Ativar botão clicado
+          botao.classList.add("bg-highlight");
+          botao.querySelector("svg").classList.add("text-activeIcon");
+          botao.querySelector("span").classList.add("text-activeIcon");
+
+          // Mostrar conteúdo
+          const idSecao = secoes[botao.id];
+          if (idSecao) {
+            document.getElementById(idSecao).classList.remove("hidden");
+          }
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>
